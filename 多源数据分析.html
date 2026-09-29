@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多源电商与本地生活用户行为数据分析 · 项目展示</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B111E'/%3E%3Ccircle cx='11' cy='14' r='5' stroke='%237C6FF0' stroke-width='2.4' fill='none'/%3E%3Ccircle cx='22' cy='14' r='5' stroke='%23F0B429' stroke-width='2.4' fill='none'/%3E%3Cpath d='M14.5 19 L18 23 L21.5 19' stroke='%237C6FF0' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700;900&display=swap">
+<style>
+:root{
+  --bg:#0B111E; --bg-soft:#0E1526; --panel:#131D33; --panel-2:#17233D;
+  --line:#22304F; --line-soft:#1B2742;
+  --text:#E8EEF8; --text-dim:#93A7C4; --text-mute:#6B7FA3;
+  --accent:#7C6FF0; --accent-soft:rgba(124,111,240,.14);
+  --gold:#F0B429; --good:#34D399; --bad:#F87171;
+  --mono:'Noto Sans SC',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);font-weight:400;line-height:1.7;-webkit-font-smoothing:antialiased}
+::selection{background:rgba(124,111,240,.3)}
+a{color:var(--accent);text-decoration:none}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+
+/* ===== Hero ===== */
+.hero{padding:92px 0 64px;position:relative;overflow:hidden;
+  background:radial-gradient(1100px 480px at 78% -10%,rgba(124,111,240,.18),transparent 62%),
+             radial-gradient(820px 420px at 8% 108%,rgba(240,180,41,.08),transparent 60%)}
+.hero .kicker{display:inline-flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.14em;color:var(--gold);font-weight:500;margin-bottom:22px}
+.hero .kicker::before{content:"";width:26px;height:2px;background:var(--gold)}
+.hero h1{font-family:'Noto Serif SC',serif;font-weight:900;font-size:clamp(32px,5vw,52px);line-height:1.18;letter-spacing:.01em}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .sub{margin-top:20px;max-width:680px;color:var(--text-dim);font-size:clamp(15px,1.7vw,17px);font-weight:300}
+.hero .tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.hero .tag{font-size:12.5px;color:var(--text-dim);border:1px solid var(--line);border-radius:100px;padding:5px 14px;background:rgba(19,29,51,.6)}
+
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:14px;overflow:hidden;margin-top:56px}
+.metric{background:var(--panel);padding:26px 24px}
+.metric .label{font-size:12.5px;color:var(--text-mute);letter-spacing:.06em}
+.metric .value{font-size:clamp(24px,3vw,32px);font-weight:700;margin-top:6px;color:var(--text)}
+.metric .value .u{font-size:14px;color:var(--text-dim);font-weight:500;margin-left:2px}
+.metric .note{font-size:12px;color:var(--text-mute);margin-top:2px}
+
+/* ===== Section scaffold ===== */
+section{padding:74px 0 20px}
+.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:14px}
+.sec-no{font-family:'Noto Serif SC',serif;font-size:15px;color:var(--accent);font-weight:700}
+.sec-title{font-family:'Noto Serif SC',serif;font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:.01em}
+.sec-title::after{content:"";display:block;width:44px;height:3px;background:linear-gradient(90deg,var(--accent),transparent);margin-top:10px}
+.sec-desc{color:var(--text-dim);max-width:780px;margin-bottom:34px;font-size:14.5px;font-weight:300}
+
+/* ===== Data sources table ===== */
+.src-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:14px;overflow:hidden}
+.src{background:var(--panel);padding:22px 20px}
+.src .nm{font-size:15px;font-weight:700;color:var(--text)}
+.src .nm .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;background:var(--gold)}
+.src .sc{font-size:12px;color:var(--text-mute);margin-top:3px}
+.src .big{font-size:22px;font-weight:700;margin-top:12px;color:var(--accent)}
+.src .big small{font-size:12.5px;color:var(--text-dim);font-weight:400}
+.src .use{font-size:12.5px;color:var(--text-dim);margin-top:8px;font-weight:300}
+
+/* ===== Timeline ===== */
+.timeline{display:grid;grid-template-columns:110px 34px 1fr;gap:0;margin-top:8px}
+.tl-row{display:contents}
+.tl-time{padding:18px 0;text-align:right;color:var(--text-mute);font-size:13px;letter-spacing:.03em;line-height:1.5}
+.tl-mid{position:relative;display:grid;place-items:center}
+.tl-mid::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--line)}
+.tl-dot{width:13px;height:13px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);z-index:1}
+.tl-card{padding:16px 22px;margin:6px 0 6px 14px;background:var(--panel);border:1px solid var(--line-soft);border-radius:12px}
+.tl-card h4{font-size:15.5px;font-weight:700;color:var(--text)}
+.tl-card h4 .s{color:var(--gold);font-weight:500;margin-right:8px}
+.tl-card p{font-size:13.5px;color:var(--text-dim);margin-top:6px;font-weight:300}
+.tl-card .out{display:inline-block;margin-top:8px;font-size:12px;color:var(--accent);border:1px solid var(--accent-soft);background:var(--accent-soft);border-radius:6px;padding:2px 9px}
+
+/* ===== Charts / panels ===== */
+.chart-box{background:var(--panel);border:1px solid var(--line-soft);border-radius:14px;padding:20px 18px 8px}
+.chart-box h4{font-size:15px;font-weight:700;padding:0 6px 4px}
+.chart-box .cap{font-size:12.5px;color:var(--text-mute);padding:0 6px 8px;font-weight:300}
+.chart{width:100%;height:420px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:8px}
+.grid2 .chart{height:400px}
+.grid22{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.grid3{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:8px}
+.fig{border:1px solid var(--line-soft);border-radius:14px;overflow:hidden;background:var(--panel)}
+.fig img{display:block;width:100%;height:auto}
+.fig .cap{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;font-size:12.5px;color:var(--text-mute);border-top:1px solid var(--line-soft)}
+.fig .cap b{color:var(--text-dim);font-weight:500}
+
+/* ===== Tables ===== */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line-soft);border-radius:14px}
+table{width:100%;border-collapse:collapse;table-layout:fixed;background:var(--panel)}
+th{font-size:12.5px;color:var(--text-mute);font-weight:500;text-align:left;padding:13px 16px;border-bottom:1px solid var(--line-soft);letter-spacing:.04em}
+td{padding:12px 16px;font-size:13.5px;border-bottom:1px solid var(--line-soft);color:var(--text-dim);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.num{color:var(--text)}
+tr:hover td{background:var(--panel-2);color:var(--text)}
+
+/* ===== Findings ===== */
+.findings{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:6px}
+.find{background:var(--panel);border:1px solid var(--line-soft);border-left:3px solid var(--accent);border-radius:10px;padding:16px 18px}
+.find h5{font-size:14px;font-weight:700;color:var(--text)}
+.find p{font-size:13px;color:var(--text-dim);margin-top:6px;font-weight:300}
+.find b{color:var(--text);font-weight:600}
+
+/* ===== Repo ===== */
+pre.code{font-family:var(--mono);font-size:13px;color:var(--text-dim);line-height:1.9;padding:6px 10px;overflow-x:auto;white-space:pre}
+
+footer{border-top:1px solid var(--line-soft);margin-top:84px;padding:40px 0 54px;color:var(--text-mute);font-size:13px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:space-between}
+
+@media (max-width:860px){
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  .src-grid{grid-template-columns:repeat(2,1fr)}
+  .grid2,.grid22{grid-template-columns:1fr}
+  .grid3{grid-template-columns:repeat(2,1fr)}
+  .findings{grid-template-columns:1fr}
+  .chart,.grid2 .chart{height:360px}
+  .timeline{grid-template-columns:74px 26px 1fr}
+}
+@media (max-width:520px){
+  .hero{padding:64px 0 44px}
+  .metrics{grid-template-columns:1fr 1fr}
+  .src-grid{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr}
+  .metric,.src{padding:18px 16px}
+  .tl-time{font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Hero ===== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">MULTI-SOURCE ANALYSIS · 多源数据 · 端到端分析</div>
+    <h1>多源电商与本地生活<em>用户行为分析</em></h1>
+    <p class="sub">基于阿里天池、Inside Airbnb、Yelp、Reddit 四个真实公开数据集（约 50 万条记录），从「需求侧用户行为」与「供给侧供给定价」双视角完成数据获取 → 清洗 → SQL 建模 → 可视化 → 业务结论的完整闭环。</p>
+    <div class="tags">
+      <span class="tag">Python · pandas</span><span class="tag">SQL · SQLite</span><span class="tag">matplotlib</span><span class="tag">VADER 情感分析</span><span class="tag">reportlab</span>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="label">数据规模</div><div class="value num">506,556<span class="u">条</span></div><div class="note">4 大公开数据集</div></div>
+      <div class="metric"><div class="label">SQL 分析语句</div><div class="value num">32<span class="u">条</span></div><div class="note">CTE · 窗口函数 · 漏斗 · 四象限</div></div>
+      <div class="metric"><div class="label">业务图表</div><div class="value num">15<span class="u">张</span></div><div class="note">+ PDF 结论报告</div></div>
+      <div class="metric"><div class="label">端到端脚本</div><div class="value num">4<span class="u">个</span></div><div class="note">清洗 → SQL → 可视化 → 报告</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== 数据源 ===== -->
+<section id="sources">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">01</span><h2 class="sec-title">数据源概览</h2></div>
+    <p class="sec-desc">四个公开真实数据集，分别支撑电商需求侧、本地生活供给侧与社区舆情三个分析视角。</p>
+    <div class="src-grid">
+      <div class="src"><div class="nm"><span class="dot" style="background:#F0B429"></span>淘宝用户行为</div><div class="sc">阿里天池 UserBehavior</div><div class="big num">327,515<small> 条行为</small></div><div class="use">170,528 用户 · 205,230 商品 · 5,187 类目<br>漏斗转化 · 用户分层 · 类目运营</div></div>
+      <div class="src"><div class="nm"><span class="dot" style="background:#7C6FF0"></span>香港 Airbnb</div><div class="sc">Inside Airbnb 快照</div><div class="big num">6,046<small> 房源</small></div><div class="use">18 个区域 · 122,454 条评论<br>供给格局 · 定价因素 · 房东生态</div></div>
+      <div class="src"><div class="nm"><span class="dot" style="background:#34D399"></span>Yelp 商家评论</div><div class="sc">Yelp Open Data 样本</div><div class="big num">1,000<small> 条评论</small></div><div class="use">498 家商家 · 平均 4.15 星<br>满意度结构 · 情感模型校验</div></div>
+      <div class="src"><div class="nm"><span class="dot" style="background:#F87171"></span>Reddit 社区评论</div><div class="sc">r/ChatGPT (Pushshift)</div><div class="big num">49,541<small> 条评论</small></div><div class="use">AI 产品用户之声 · 社区舆情<br>痛点主题 · 长文本负面预警</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 流程 ===== -->
+<section id="pipeline">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">02</span><h2 class="sec-title">分析流程</h2></div>
+    <p class="sec-desc">四个脚本串联全流程，每步的输入输出都可独立回溯重跑。</p>
+    <div class="timeline">
+      <div class="tl-row"><div class="tl-time num">step1<br>数据清洗</div><div class="tl-mid"><span class="tl-dot"></span></div><div class="tl-card"><h4><span class="s">①</span>数据清洗（pandas）</h4><p>异常值过滤、去重、缺失值处理、价格/日期类型转换、99 分位缩尾（$4,619 封顶）、文本 VADER 情感打分，全程留痕输出清洗日志。</p><span class="out">输出 · cleaned/ + cleaning_report.csv</span></div></div>
+      <div class="tl-row"><div class="tl-time num">step2<br>SQL 建模</div><div class="tl-mid"><span class="tl-dot"></span></div><div class="tl-card"><h4><span class="s">②</span>SQL 分析（SQLite）</h4><p>32 条查询：CTE、窗口函数（NTILE/ROW_NUMBER/CASE 分桶）、漏斗聚合、四象限分层、跨表聚合。</p><span class="out">输出 · 32 份结果 CSV</span></div></div>
+      <div class="tl-row"><div class="tl-time num">step3<br>可视化</div><div class="tl-mid"><span class="tl-dot"></span></div><div class="tl-card"><h4><span class="s">③</span>可视化（matplotlib）</h4><p>15 张中文业务图表：漏斗、时段分布、类目四象限、房型定价、房东生态、舆情温度计、议题频次。</p><span class="out">输出 · output/figures/</span></div></div>
+      <div class="tl-row"><div class="tl-time num">step4<br>报告输出</div><div class="tl-mid"><span class="tl-dot"></span></div><div class="tl-card"><h4><span class="s">④</span>PDF 报告（reportlab）</h4><p>汇总三视角结论与业务建议，输出可直接阅读的《多源数据分析报告》。</p><span class="out">输出 · 多源数据分析报告.pdf</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 淘宝电商分析 ===== -->
+<section id="tb">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">03</span><h2 class="sec-title">淘宝用户行为 · 电商增长视角</h2></div>
+    <p class="sec-desc">天池 UserBehavior 单日切片（09:00–15:00 时段），清洗后保留 327,515 条行为、覆盖 170,528 名用户。</p>
+    <div class="grid2">
+      <div class="chart-box">
+        <h4>用户行为漏斗（用户级转化率）</h4>
+        <div class="cap">浏览 → 购买整体转化率 4.62%；加购渗透率高于收藏，是更强的购买意向信号</div>
+        <div class="chart" id="funnelChart"></div>
+      </div>
+      <div class="fig">
+        <img src="assets/tb_funnel.png" alt="淘宝漏斗">
+        <div class="cap"><b>项目产出图 · 用户行为漏斗</b><span>fig_tb_funnel.png</span></div>
+      </div>
+    </div>
+    <div class="findings">
+      <div class="find"><h5>意向沉淀严重</h5><p>收藏→购买当日转化仅 <b>2.96%</b>、加购→购买 <b>2.76%</b>。大量意向未在当日兑现，购物车/收藏召回（降价提醒、凑单推送）是明确可量化的增长抓手。</p></div>
+      <div class="find"><h5>复购结构稀薄</h5><p><b>95.6%</b> 的购买用户当日仅成交 1 次，短期复购靠跨天召回 + 个性化推荐提升。</p></div>
+      <div class="find"><h5>二八法则显著</h5><p>最活跃 10% 用户（D10）贡献 <b>29.1%</b> 行为量（D1 仅 5.21%），头部用户分层运营（会员/权益）ROI 更高。</p></div>
+      <div class="find"><h5>浏览深度与成交正相关</h5><p>购买用户人均行为 <b>2.5</b> 次、触达 <b>2.3</b> 件商品，未购用户仅 1.9 次 / 1.9 件——延长浏览路径可拉动转化。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Airbnb 供给分析 ===== -->
+<section id="ab">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">04</span><h2 class="sec-title">香港 Airbnb 供给与定价 · 策略运营视角</h2></div>
+    <p class="sec-desc">2026 年 6 月快照 6,046 套有效房源，价格经解析、非正值剔除与 99 分位缩尾（$4,619 封顶）后建模。</p>
+    <div class="grid2">
+      <div class="chart-box">
+        <h4>房型供给结构与平均定价</h4>
+        <div class="cap">私人房间供给占 61.3%、均价 $425；整套房源占 36.5%、均价 $1,184（约 2.8 倍）</div>
+        <div class="chart" id="roomChart"></div>
+      </div>
+      <div class="chart-box">
+        <h4>房东规模 vs 房均年化收入</h4>
+        <div class="cap">个人房东（1-2 套）房均年化收入 $50,801 最高；机构房东以低价走量（$3,610）</div>
+        <div class="chart" id="hostChart"></div>
+      </div>
+    </div>
+    <div class="findings">
+      <div class="find"><h5>供给高度集中</h5><p>头部 <b>10%</b> 房东控制 <b>69.4%</b> 房源；机构（50+ 套，17 位房东）占 39.9% 房源——平台呈「机构化」结构。</p></div>
+      <div class="find"><h5>超级房东溢价</h5><p>Superhost 均价 <b>$897 vs $670（+34%），年化预估收入 93,760 vs 13,546（约 7 倍）</b>——品质认证是最有效的供给侧增长杠杆。</p></div>
+      <div class="find"><h5>口碑带来定价权</h5><p>评论 1–50 条区间房源均价最高（$811–893），显著高于无评分新房源（$544），口碑积累约 <b>+50%</b> 溢价。</p></div>
+      <div class="find"><h5>区域格局</h5><p>油尖旺（2,430 套）与湾仔为核心供给区；观塘供给紧张度 <b>48.0%</b> 全港最供不应求；离岛均价 $1,205 为度假高价区。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 舆情分析 ===== -->
+<section id="yp">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">05</span><h2 class="sec-title">Yelp 与 Reddit 社区舆情 · 用户之声视角</h2></div>
+    <p class="sec-desc">Yelp 校验文本情感打分的可靠性，Reddit r/ChatGPT 定位 AI 产品用户的真实讨论焦点。</p>
+    <div class="grid2">
+      <div class="chart-box">
+        <h4>Yelp 评论星级分布（N=1,000）</h4>
+        <div class="cap">5 星占 59.2%；1-2 星差评合计 13.8%，呈重尾分布</div>
+        <div class="chart" id="ypChart"></div>
+      </div>
+      <div class="chart-box">
+        <h4>r/ChatGPT 评论情感分布（N=49,541）</h4>
+        <div class="cap">负面率 25.3%——正面 51.9%，中性 22.8%</div>
+        <div class="chart" id="rdSentChart"></div>
+      </div>
+    </div>
+    <div class="chart-box" style="margin-top:22px">
+      <h4>AI 产品核心议题提及频次（关键词匹配）</h4>
+      <div class="cap">「工作替代」是最大讨论焦点；「回答错误」「使用限制」构成主要痛点</div>
+      <div class="chart" id="rdTopicsChart" style="height:360px"></div>
+    </div>
+    <div class="findings">
+      <div class="find"><h5>差评表达欲更强</h5><p>Yelp 差评平均词数 <b>144</b> 词，约为好评（93 词）的 <b>1.5 倍</b>——不满的用户写得更长，差评响应应最高优先级。</p></div>
+      <div class="find"><h5>情感模型可靠</h5><p>VADER 情感得分与星级单调对应（1 星 <b>-0.11</b> → 5 星 <b>+0.92</b>），可用于自动化差评预警。</p></div>
+      <div class="find"><h5>长文本是负面富集区</h5><p>Reddit 150–300 字评论负面率 <b>30.3%</b>，50 字以下仅 16.0%——长评应作为舆情监控重点。</p></div>
+      <div class="find"><h5>产品启示</h5><p>「可控性 &gt; 能力上限」——减少错误回答与信任建设是最大未满足需求，其次是价格与使用限制的沟通透明度。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION: concl -->
+<!-- SECTION: yp -->
+<!-- ===== 综合结论 ===== -->
+<section id="concl">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">06</span><h2 class="sec-title">综合结论与业务建议</h2></div>
+    <p class="sec-desc">三个数据集的统一结论，可直接迁移到电商与本地生活业务的日常运营监控。</p>
+    <div class="tbl-wrap">
+      <table>
+        <colgroup><col style="width:18%"><col style="width:42%"><col style="width:40%"></colgroup>
+        <thead><tr><th>分析模块</th><th>关键发现</th><th>业务建议</th></tr></thead>
+        <tbody>
+          <tr><td class="num"><b>电商用户行为</b></td><td>整体转化率 4.62%，意向沉淀严重；10% 用户贡献 29% 行为量</td><td>收藏/加购召回 + 头部用户分层运营；延长浏览路径拉动转化</td></tr>
+          <tr><td class="num"><b>Airbnb 供给定价</b></td><td>超级房东溢价 +34%、收入差 7 倍；头部 10% 房东控制 69% 房源</td><td>品质认证激励 + 差异化房东策略；大户型高评分房源优先流量倾斜</td></tr>
+          <tr><td class="num"><b>社区舆情</b></td><td>AI 社区负面率 25%，「回答错误」高频；差评用户表达欲更强</td><td>长文本负面预警机制；纠错与信任建设优先于能力竞技</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="findings" style="margin-top:20px">
+      <div class="find"><h5>全流程可复现</h5><p>4 个脚本（清洗 → SQL → 可视化 → 报告）+ 32 条 SQL 全部沉淀在项目中，任何环节可独立回溯重跑。</p></div>
+      <div class="find"><h5>清洗留痕</h5><p>每一步清洗动作记录于 cleaning_report.csv，保证分析结论可审计。</p></div>
+      <div class="find"><h5>指标体系沉淀</h5><p>漏斗转化 / RFM / 二八集中度 / 供给紧张度 / 情感分位——可直接迁移为业务日常监控指标。</p></div>
+      <div class="find"><h5>数据口径说明</h5><p>淘宝数据为单日切片（09:00–15:00），留存/跨日复购受窗口限制；价格为 HKD，无需汇率转换。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 项目产出图集 ===== -->
+<section id="assets">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">07</span><h2 class="sec-title">项目产出图集</h2></div>
+    <p class="sec-desc">脚本运行直接生成的中文业务图表（原始输出，未加工）。</p>
+    <div class="grid3">
+      <div class="fig"><img src="assets/ab_hostscale.png" alt="房东生态"><div class="cap"><b>房东生态 · 供给集中度与经营效率</b><span>fig_ab_hostscale</span></div></div>
+      <div class="fig"><img src="assets/yp_rating.png" alt="Yelp星级"><div class="cap"><b>Yelp 满意度结构</b><span>fig_yp_rating</span></div></div>
+      <div class="fig"><img src="assets/rd_sentiment.png" alt="Reddit情感"><div class="cap"><b>r/ChatGPT 舆情温度计</b><span>fig_rd_sentiment</span></div></div>
+      <div class="fig"><img src="assets/rd_painpoints.png" alt="核心议题"><div class="cap"><b>AI 产品核心议题频次</b><span>fig_rd_painpoints</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 仓库与运行 ===== -->
+<section id="repo">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">08</span><h2 class="sec-title">仓库结构与运行</h2></div>
+    <p class="sec-desc">完整项目已在本地可复现，clone 后按步骤重跑即可生成全部结果。</p>
+    <div class="grid2">
+      <div class="chart-box">
+        <h4>仓库结构</h4>
+        <div class="cap">数据分析项目_多源用户行为与舆情分析 /</div>
+        <pre class="code">├── README.md
+├── data/
+│   ├── raw/        # 原始数据
+│   ├── cleaned/    # 清洗后 CSV
+│   └── analysis.db # SQLite 分析库
+├── sql/            # 4 个 SQL 文件（32 条语句）
+├── scripts/
+│   ├── step1_data_cleaning.py
+│   ├── step2_sql_analysis.py
+│   ├── step3_visualization.py
+│   └── step4_pdf_report.py
+└── output/
+    ├── figures/    # 15 张业务图表
+    ├── tables/     # 32 份分析结果
+    ├── cleaning_report.csv
+    └── 多源数据分析报告.pdf</pre>
+      </div>
+      <div class="chart-box">
+        <h4>运行方式</h4>
+        <div class="cap">Python 3.11+ · pandas · matplotlib · reportlab · vaderSentiment</div>
+        <pre class="code">pip install pandas matplotlib \
+            reportlab vaderSentiment
+
+python scripts/step1_data_cleaning.py
+python scripts/step2_sql_analysis.py
+python scripts/step3_visualization.py
+python scripts/step4_pdf_report.py
+
+# 结果输出至 output/ 目录</pre>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<script>
+const C = { accent:'#7C6FF0', gold:'#F0B429', good:'#34D399', bad:'#F87171', mute:'#6B7FA3',
+            text:'#E8EEF8', dim:'#93A7C4', grid:'rgba(34,48,79,.55)' };
+const baseOpt = {
+  backgroundColor:'transparent',
+  textStyle:{ color:C.dim, fontFamily:'Noto Sans SC, sans-serif' },
+  tooltip:{ confine:true, backgroundColor:'#17233D', borderColor:'#22304F', textStyle:{ color:'#E8EEF8', fontSize:12 } },
+  grid:{ left:8, right:60, top:12, bottom:8, containLabel:true },
+  animationDuration:700
+};
+const mkBar = (id, cats, vals, labels, colors, xName, formatter) => {
+  const el = document.getElementById(id);
+  const opt = {
+    ...baseOpt,
+    tooltip:{ ...baseOpt.tooltip, formatter:formatter },
+    xAxis:{ type:'value', name:xName||'', nameTextStyle:{ color:C.mute, fontSize:11 }, axisLine:{ lineStyle:{ color:C.grid } }, axisLabel:{ color:C.dim, fontSize:11 }, splitLine:{ lineStyle:{ color:C.grid } } },
+    yAxis:{ type:'category', inverse:true, data:cats, axisLine:{ show:false }, axisTick:{ show:false }, axisLabel:{ color:C.dim, fontSize:11.5 } },
+    series:[{ type:'bar', data:vals.map((v,i)=>({ value:v, itemStyle:{ color:colors[i], borderRadius:[0,4,4,0] } })), barWidth:'54%',
+      label:{ show:true, position:'right', color:C.text, fontSize:12, formatter:labels ? p=>labels[p.dataIndex] : p=>p.value } }]
+  };
+  if(colors.length===1) opt.series[0].data = vals.map(v=>({ value:v, itemStyle:{ color:colors[0] } }));
+  echarts.init(el).setOption(opt);
+};
+
+/* 淘宝漏斗（横向条形） */
+mkBar('funnelChart',
+  ['浏览 pv','收藏 fav','加购 cart','购买 buy'],
+  [157965, 8476, 15787, 7297],
+  ['157,965  (100%)','8,476  (5.4%)','15,787  (10.0%)','7,297  (4.6%)'],
+  [C.dim, C.gold, C.accent, C.good],
+  '用户数',
+  p => `${p.name}<br/>用户数 = <b style="color:'+C.accent+'">${p.value.toLocaleString()}</b>`
+);
+
+/* 房型均价 */
+mkBar('roomChart',
+  ['Private room','Entire home/apt','Shared room','Hotel room'],
+  [425, 1184, 288, 675],
+  ['$425 · 供给 61.3%','$1,184 · 供给 36.5%','$288 · 供给 1.9%','$675 · 供给 0.2%'],
+  [C.gold, C.accent, C.dim, C.good],
+  '均价 (HK$/晚)',
+  p => `${p.name}<br/>均价 = <b style="color:'+C.gold+'">$${p.value}</b>`
+);
+
+/* 房东年化收入 */
+mkBar('hostChart',
+  ['个人 (1-2套)','小型 (3-10套)','专业 (11-50套)','机构 (50+套)'],
+  [50801, 43192, 26005, 3610],
+  ['$50,801 · 922位房东','$43,192 · 271位房东','$26,005 · 100位房东','$3,610 · 17位房东'],
+  [C.accent, C.gold, C.dim, C.mute],
+  '房均年化收入 (HK$)',
+  p => `${p.name}<br/>年化收入 = <b style="color:'+C.accent+'">$${p.value.toLocaleString()}</b>`
+);
+
+/* Yelp 星级分布 */
+mkBar('ypChart',
+  ['1 星','2 星','3 星','4 星','5 星'],
+  [88, 50, 75, 195, 592],
+  ['88 (8.8%)','50 (5.0%)','75 (7.5%)','195 (19.5%)','592 (59.2%)'],
+  [C.bad, C.bad, C.gold, C.gold, C.good],
+  '评论数',
+  p => `${p.name}<br/>评论数 = <b style="color:'+C.text+'">${p.value}</b>`
+);
+
+/* Reddit 情感分布 */
+mkBar('rdSentChart',
+  ['正面','中性','负面'],
+  [25724, 11295, 12522],
+  ['25,724 (51.9%)','11,295 (22.8%)','12,522 (25.3%)'],
+  [C.good, C.dim, C.bad],
+  '评论数',
+  p => `${p.name}<br/>评论数 = <b style="color:'+C.text+'">${p.value.toLocaleString()}</b>`
+);
+
+/* Reddit 痛点议题 */
+mkBar('rdTopicsChart',
+  ['工作替代 (job)','回答错误 (wrong)','使用限制 (limit)','好用/惊艳 (amazing)','付费/订阅 (pay)','替代品/竞争 (better than)','封号/审查 (banned)','幻觉/胡编 (hallucination)'],
+  [1824, 1229, 922, 754, 506, 408, 236, 43],
+  null,
+  [C.accent, C.bad, C.gold, C.good, C.gold, C.dim, C.bad, C.mute],
+  '提及数',
+  p => `${p.name}<br/>提及数 = <b style="color:'+C.accent+'">${p.value.toLocaleString()}</b>`
+);
+
+window.addEventListener('resize', ()=>{
+  document.querySelectorAll('.chart').forEach(el=>{
+    const inst = echarts.getInstanceByDom(el);
+    if(inst) inst.resize();
+  });
+});
+</script>
+</body>
+</html>
