@@ -1,0 +1,26 @@
+{
+  "taobao": {
+    "rows": 327515,
+    "users": 170528,
+    "items": 205230,
+    "categories": 5187,
+    "date_min": "2017-11-26",
+    "date_max": "2017-11-26"
+  },
+  "airbnb": {
+    "listings": 6046,
+    "reviews": 122454,
+    "price_p99": 4618.875000000011,
+    "neighbourhoods": 18,
+    "review_date_max": "2026-06-30"
+  },
+  "yelp": {
+    "rows": 1000,
+    "businesses": 498,
+    "avg_rating": 4.15
+  },
+  "reddit": {
+    "rows": 49541,
+    "neg_ratio": 0.2528
+  }
+}
